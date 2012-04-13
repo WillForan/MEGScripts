@@ -1,0 +1,50 @@
+#
+#	This is an example of a description file for averaging
+#	
+#	Lines beginning with '#' are comments
+#
+average {
+	name 		"All"
+#
+#	Output files
+#	The log file is useful for debugging and
+#	selection of interesting events using 'eventfile'
+#
+#	outfile         ANTI_ave.fif
+#	logfile         All_ave.log
+#	eventfile	MN.eve
+#
+#	Rejection limits
+#
+#	stimIgnore is optional to omit a stimulus artefact from 
+#	the rejection
+#
+stimIgnore -1
+gradReject 3e-10
+magReject 1e-11
+#eegReject	40e-6
+#eogReject	150e-5
+#
+#	Additional rejection parameters
+#
+#	eegReject	20e-6 # 20e-6
+#	ecgReject	10e-3
+#
+#	The first category follows
+#	
+#	'condition' can be used instead of 'category'
+#
+
+	
+category {
+name "ANTI-and-VGS"
+event 25
+ignore 0
+tmin -2.0
+tmax 1.0
+bmin -2.0
+bmax -1.8
+}
+
+	
+}
