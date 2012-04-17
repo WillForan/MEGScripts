@@ -100,7 +100,7 @@ function [meanD, motion_anim] =  MEG_mean_dist(head,fif)
  end
 
 % div all sums by number of sensors
-meanD = meanD./num_sense;
+meanD = meanD./num_sense .* 1000;
 
 meanD =  [0; meanD];
 % save movie for visual inspection
