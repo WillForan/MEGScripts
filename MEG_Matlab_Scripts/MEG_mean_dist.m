@@ -79,7 +79,8 @@ function [meanD, varargout] =  MEG_mean_dist(head,fif)
     %Visualize
     if(nargout>1)
        plot3(coor_cur(1,:),coor_cur(2,:),coor_cur(3,:),'k.');
-       view(-90,90);
+       %view(-90,90);
+       view(-140,20);
        drawnow;
        varargout{1}(end+1)=getframe;
     end
