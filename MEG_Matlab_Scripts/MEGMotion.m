@@ -12,7 +12,7 @@ for i=1:length(runs)
    movie2avi(motion_movie, [outdir name '.avi']) %20M per file :(
    [n,x] = hist(displacement);
    bar(x,n);
-   hgexport(i,[outdir name '_hist.jpg']);
+   hgexport(i,[outdir name '_hist.eps']);
 
    txtout = fopen([outdir name '.txt'],'w');
    fprintf('\n\n# %s\n',name);

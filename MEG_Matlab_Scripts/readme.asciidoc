@@ -1,0 +1,18 @@
+== Motion
+
+`MEGMotion.m` is a script that wraps around `MEG_mean_dist.m`
+
+
+Find mean displacment across 103 sensor positions converted from device space to head space.
+
+Sensors converted based on 'MaxFilter v2.1 Users Manual: Appendex D.2 Coordinate matching (pg 77)' and channels CHP001 to 006.
+
+[latex]
+$ y_j = Rx_j + T $
+
+Displacement calculation from Wehner et al, 2008 as the mean norm temporal difference of each sensor.
+
+[latex]
+$ D(t) = \frac{1}{N} \sum^{N_s}_{k=1} \| r_h^{k}(t) - r_h^{k}(t_0) \| $
+
+NOTE:  Should have named MEG_mean_disp instead of _dist.
