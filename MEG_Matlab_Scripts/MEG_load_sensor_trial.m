@@ -23,7 +23,8 @@ function [ output, events ] = MEG_load_sensor_trial( inputfile, eventfile, preSt
 %       output.trialinfo - trigger code.
 %       events - events in mne event file format
 %
-%   Last update 3.15.2012, by Kai
+%   update 3.15.2012, by Kai
+%   update 4.17.2012 (WF)
 
 %load fiff data
 [hdr,data] = read_fiff(inputfile);
@@ -54,6 +55,10 @@ output.label = hdr.info.ch_names(1:end-1)';
 %sampling frequency
 output.fsample = hdr.info.sfreq;
 epochLength = preStim+postStim;
+
+% add displacment channel
+output.label(end+1) = 'displacment';
+data(end+1,:)       = MEG_mean_dist(hdr,data)';
 
 output.trial = [];
 for n = 2:1:size(trigs,1)
