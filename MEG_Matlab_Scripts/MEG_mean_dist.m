@@ -102,6 +102,7 @@ function [meanD, motion_anim] =  MEG_mean_dist(head,fif)
 % div all sums by number of sensors
 meanD = meanD./num_sense;
 
+meanD =  [0; meanD];
 % save movie for visual inspection
 %save('subjMotionVideo.mat', 'motion_anim');
 
