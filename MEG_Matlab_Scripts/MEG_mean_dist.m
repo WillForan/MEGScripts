@@ -27,7 +27,7 @@ function meanD =  MEG_mean_dist(head,fif)
    end
  end
 
- % remove duplicates
+ % remove duplicate positions  (3 sesors at each position)
  sense_cords=unique(sense_cords','rows')';
 
  num_sense = length(sense_cords(1,:));
@@ -37,31 +37,41 @@ function meanD =  MEG_mean_dist(head,fif)
  coor_prev = coor_cur;
  %init displacement: will be (t1-t0) for all fif measurements
  meanD = zeros(length(fif)-1,1);
+ fig=figure('Visible', 'off');
+ %set(fig,'Visible','off')
+ motion_anim=getframe;
+ %posChange=[];
 
  %posChange = zeros(length(fif),12);
+ 
  % calc mean displacement (Wehner, 2008)
  for i = 1:length(fif)
      
-    % if no motion change, set to zero and move to next
-    if(i>1 && fif(313:321,i) == fif(313:321,i-1) )
+    % if no motion change, set displacement to zero and move to next
+    if(i>1 && all(fif(313:321,i) == fif(313:321,i-1)) )
         meanD(i-1) = 0;
         continue;
     end
     
     % build current head space coordinates of all unique sensor positions
-    coor_cur = zeros(3,num_sense);
-
     for j = 1:num_sense
-       rots  = fif(313:318,i);
-       rots  = R( rots(1),rots(2), rots(3) );
-       trans = fif(319:321,i);
+       rots  = R( fif(313,i) ,fif(314,i), fif(315,i));
+       trans = fif(316:318,i);
        
-       posChange(end+1,:) = [ rots(:)' trans' ];
-       disp(posChange(end,:));
+       %posChange(end+1,:) = [ i rots(:)' trans' ];
+       %disp(posChange(end,:));
 
-       % displacemnt at current time
+       % coordinates at current time
        coor_cur(:,j) =  rots*sense_cords(:,j) + trans;
+       
     end
+    
+    %Visualize
+    plot3(coor_cur(1,:),coor_cur(2,:),coor_cur(3,:),'k.');
+    view(-90,90);
+    drawnow;
+    motion_anim(end+1)=getframe;
+    
     
    % when there is something to compare
    if i>1
@@ -70,12 +80,13 @@ function meanD =  MEG_mean_dist(head,fif)
       end
    end
 
-   % push current to old
+   % push current to prev
    coor_prev = coor_cur;
  end
 
- % div all sums by number of sensors
+% div all sums by number of sensors
 meanD = meanD./num_sense;
+save('subjMotionVideo', 'motion_anim');
 
 end
 
