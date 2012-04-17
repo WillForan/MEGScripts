@@ -1,4 +1,4 @@
-function meanD =  MEG_mean_dist(head,fif)
+function [meanD, motion_anim] =  MEG_mean_dist(head,fif)
 
  % fif is aquired by
  %[head,fif] = read_fiff(fif_filename);
@@ -18,6 +18,8 @@ function meanD =  MEG_mean_dist(head,fif)
  %                z1 z2 z3 z4 ] ;
  %
 
+ % if censor has info (>3 entries)
+ % add to censor cords
  count=0; 
  for i=1:length(head.info.chs)
    trans=head.info.chs(i).coil_trans;
@@ -37,19 +39,32 @@ function meanD =  MEG_mean_dist(head,fif)
  coor_prev = coor_cur;
  %init displacement: will be (t1-t0) for all fif measurements
  meanD = zeros(length(fif)-1,1);
- fig=figure('Visible', 'off');
+
+ figure
+ motion_anim=getframe; % first frame empty
+
+ %fig=figure('Visible', 'off');
  %set(fig,'Visible','off')
- motion_anim=getframe;
  %posChange=[];
 
  %posChange = zeros(length(fif),12);
+
+ % chop off empty start
+ %while( all(fif(313:321,1) == 0) )
+ %  fif(:,i)=[];
+ %end
  
  % calc mean displacement (Wehner, 2008)
+ meandIdx=0;
  for i = 1:length(fif)
-     
+    if(all(fif(313:321,i) == 0))
+      continue;
+    end
+    meandIdx=meandIdx+1;
+
     % if no motion change, set displacement to zero and move to next
-    if(i>1 && all(fif(313:321,i) == fif(313:321,i-1)) )
-        meanD(i-1) = 0;
+    if(meandIdx>1 && all(fif(313:321,i) == fif(313:321,i-1)) )
+        meanD(meandIdx-1) = 0;
         continue;
     end
     
@@ -74,9 +89,9 @@ function meanD =  MEG_mean_dist(head,fif)
     
     
    % when there is something to compare
-   if i>1
+   if meandIdx>1
       for j = 1:num_sense
-        meanD(i-1) = meanD(i-1) + norm( coor_cur(:,j) - coor_prev(:,j) );
+        meanD(meandIdx-1) = meanD(meandIdx-1) + norm( coor_cur(:,j) - coor_prev(:,j) );
       end
    end
 
@@ -86,7 +101,9 @@ function meanD =  MEG_mean_dist(head,fif)
 
 % div all sums by number of sensors
 meanD = meanD./num_sense;
-save('subjMotionVideo', 'motion_anim');
+
+% save movie for visual inspection
+%save('subjMotionVideo.mat', 'motion_anim');
 
 end
 
