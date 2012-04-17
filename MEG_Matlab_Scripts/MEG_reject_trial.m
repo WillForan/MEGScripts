@@ -75,9 +75,9 @@ end
 if any(bad_triallist)
     bad_triallist = unique(bad_triallist);
     fprintf('\n*\n*\n*\n')
-    disp(['Bad trials found:' num2str(bad_triallist) ]);
+    disp(['Bad trials found:' num2str(length(bad_triallist)) ]);
     fprintf('\n*\n*\n*\n')
-    bad_triallist = bad_triallist +1;
+    bad_triallist = bad_triallist +1; %the first line in event file is all zero
     events(bad_triallist,:)=[];
     
     dlmwrite(eventfile, events, 'delimiter', '\t',  'precision', 10);
