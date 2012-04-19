@@ -78,15 +78,22 @@ for t = 1:length(Thresholds)
 
            % get the maximum difference
            maxi = max(output.trial{i}(r,:));
-           mini = min(output.trial{i}(r,:));
+
+           % min is 0 for motion, this is likely not necessary
+           % actual min elsewhere
+           if cRegexp == 'displacement'
+              mini = 0;
+           else
+              mini = min(output.trial{i}(r,:));
+           end
+
            peaktopeak = maxi-mini;
 
            % drop if too high
            if peaktopeak > cThres 
                bad_triallist = [bad_triallist, i];
-               fprintf('%s: Dumping %i because a > b: ', cRegexp, i); %.4f > %.4f (%s)\n', i,maxi,cThres,cRegexp);
-               disp([maxi,cThres]);
-               break 
+               fprintf('Dumping trial %3i: %s: max-min %g > thres %g \n',i,cRegexp, maxi,cThres);
+               break % from all cRegexp matching channels in this trial -- move to next channel type in same trial
            end
        end % channels
    end % trial
