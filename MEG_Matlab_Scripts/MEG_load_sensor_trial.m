@@ -35,6 +35,15 @@ data(end,:) = [];
 
 %load event files
 trigs = load(eventfile);
+
+%% if there is an offset
+% e.g. data that hasn't been through ICA
+if hdr.first_samp > 0   % if it is zero, could still do this -- but check wouldn't be useful?
+ trig(:,1) = trig(:,1) + hdr.first_samp;
+ trig(:,2) = trig(:,2).*4/1000;
+end
+
+% events never used, trigs never modified?
 events = trigs;
 
 %check initial offset and sampling frequency
