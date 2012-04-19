@@ -1,4 +1,5 @@
 function [ bad_triallist ] = MEG_reject_trial( input, eventfile,newEventfile, prestim, poststim, MAGthresh, GRADthresh, MOTthresh )
+%                                              .fif    .eve      new.eve        2.5      1         1e-11       3e-10      5
 %This function will check for sensor artifacts for each trial, and reject
 %trials that peak-to-peak amplitude that exceeds a preset threshold. The
 %cleaned event list will be write out to a new file.
@@ -13,7 +14,7 @@ function [ bad_triallist ] = MEG_reject_trial( input, eventfile,newEventfile, pr
 %   MAGthresh  - threshold for magnetometers    (suggest values is 1e-11)
 %                if peak to peak value in any magnetometer channel exceeds
 %                this threshold, trial will be removed from trial list.
-%   GRADthresh - threshold for magnetometers    (suggest values is 1e-11)
+%   GRADthresh - threshold for magnetometers    (suggest values is 3e-10)
 %                if peak to peak value in any gradiometer channel exceeds
 %                this threshold, trial will be removed from trial list.
 %   MOTthresh  - theshold for motion in mm      (initial value tested = 5)
