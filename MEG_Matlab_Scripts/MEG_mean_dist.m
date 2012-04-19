@@ -5,14 +5,25 @@
 % called with two                  return movie of motion (displayed as it's made)
 
 function [meanD, varargout] =  MEG_mean_dist(head,fif)
+ %% check arguments
  if(length(nargout)>2)
   error('MEG_mean_dist','too many outputs expected');
   return
  end
 
+ %% Find CHPI channels
+ CHPIs    = {'CHPI001' 'CHPI002' 'CHPI003' 'CHPI004' 'CHPI005' 'CHPI006'};
+ CHPIidxs = zeros(1,length(CHPIs));
+
+ for c = 1:length(CHPIs); 
+  % find index matching each CHPI channel name
+  CHPIidxs(c) = find( strcmp(head.info.ch_names, CHPIs{1}) );
+ end
+
  % ensure head.info.chs.coil_trans represents postion: graph it
  %  count=0; for i=1:length(h.info.chs); if(length(h.info.chs(i).coil_trans)>3);count=count+1;  a(count,:)=h.info.chs(i).coil_trans(1:3,4);end; end; plot3(a(:,1),a(:,2),a(:,3),'k.')
 
+ %% get sensor positions
  % if censor has info (>3 entries)
  % add to censor cords
  count=0; 
@@ -42,6 +53,7 @@ function [meanD, varargout] =  MEG_mean_dist(head,fif)
  %init displacement: will be (t1-t0) for all fif measurements
  meanD = zeros(length(fif),1);
 
+ % are we making a movie?
  if(nargout>1)
     figure
     varargout{1}=getframe; % first frame empty
@@ -53,7 +65,7 @@ function [meanD, varargout] =  MEG_mean_dist(head,fif)
  %% find the start of recording
  % and give 0s while not started
  recordIdx=1;
- while( all(fif(313:321,recordIdx) == 0) )
+ while( all( fif(CHPIidxs,recordIdx) == 0) )
       meanD(recordIdx) = 0;   
       recordIdx=recordIdx+1;
  end
@@ -62,15 +74,18 @@ function [meanD, varargout] =  MEG_mean_dist(head,fif)
  for i = recordIdx:length(fif)
     % if no motion change 
     % set displacement to zero and move to next
-    if( all(fif(313:321,i) == fif(313:321,i-1)) )
+    if( all(fif(CHPIidxs,i) == fif(CHPIidxs,i-1)) )
         meanD(i) = 0;
         continue;
     end
     
     % build current head space coordinates of all unique sensor positions
     for j = 1:num_sense
-       rots  = R( fif(313,i) ,fif(314,i), fif(315,i));
-       trans = fif(316:318,i);
+       % cal R using first 3 (+ 0 to be solved for) CHPIs
+       rots  = R( fif(CHPIidxs(1),i) ,fif(CHPIidxs(2),i), fif(CHPIidxs(3),i));
+
+       % use last 3 as trans
+       trans = fif(CHPIidxs(4:6),i);
 
        % coordinates at current time
        coor_cur(:,j) =  rots*sense_cords(:,j) + trans;
@@ -111,8 +126,8 @@ function r=R(q1, q2, q3)
  q0 = sqrt( 1 - (q1^2 + q2^2 + q3^2) ); %sum q0..3 = 1
 
  %rot matrix
- r  = [ (q0^2 + q1^2 - q2^2 -q3^2), 2*(q1*q2 - q0*q3)         , 2*(q1*q3 + q0*q2) ; 
-       2*(q1*q2 + q0*q3)          , (q0^2 + q2^2 - q1^2 -q3^2), 2*(q2*q3 + q0*q1) ; 
-       2*(q1*q3 - q0*q2)          , 2*(q2*q3 + q0*q1)         , (q0^2 + q3^2 - q1^2 -q2^2)  ] ;
+ r  = [  (q0^2 + q1^2 - q2^2 -q3^2),       2*(q1*q2 - q0*q3)      ,        2*(q1*q3 + q0*q2)        ; 
+             2*(q1*q2 + q0*q3)     ,    (q0^2 + q2^2 - q1^2 -q3^2),        2*(q2*q3 + q0*q1)        ; 
+             2*(q1*q3 - q0*q2)     ,       2*(q2*q3 + q0*q1)      ,   (q0^2 + q3^2 - q1^2 -q2^2)  ] ;
 
 end

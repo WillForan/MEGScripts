@@ -1,27 +1,32 @@
-function [ bad_triallist ] = MEG_reject_trial( input, eventfile,newEventfile, prestim, poststim, MAGthresh, GRADthresh, MOTthres )
+function [ bad_triallist ] = MEG_reject_trial( input, eventfile,newEventfile, prestim, poststim, MAGthresh, GRADthresh, MOTthresh )
 %This function will check for sensor artifacts for each trial, and reject
 %trials that peak-to-peak amplitude that exceeds a preset threshold. The
 %cleaned event list will be write out to a new file.
 %
 %Usage: [ bad_triallist ] = MEG_reject_trial( input, eventfile, prestim, 
-%       poststim, MAGthresh, GRADthresh )
+%       poststim, MAGthresh, GRADthresh, MOTthresh )
 %
-%   input - fiff file to be loaded
-%   eventfile - event file in mne format that defines tials to be examined
-%   prestim - prestimulus length in seconds
-%   poststim - poststimulus length in seconds
-%   MAGthresh - threshold for magnetometers, suggest values is 1e-11
-%               if peak to peak value in any magnetometer channel exceeds
-%               this threshold, trial will be removed from trial list.
-%   Gradthresh - threshold for magnetometers, suggest values is 1e-11
-%               if peak to peak value in any gradiometer channel exceeds
-%               this threshold, trial will be removed from trial list.
+%   input      - fiff file to be loaded
+%   eventfile  - event file in mne format that defines tials to be examined
+%   prestim    - prestimulus length in seconds  (initial experment value = 2.5 )
+%   poststim   - poststimulus length in seconds (initial experment value = 1   )
+%   MAGthresh  - threshold for magnetometers    (suggest values is 1e-11)
+%                if peak to peak value in any magnetometer channel exceeds
+%                this threshold, trial will be removed from trial list.
+%   GRADthresh - threshold for magnetometers    (suggest values is 1e-11)
+%                if peak to peak value in any gradiometer channel exceeds
+%                this threshold, trial will be removed from trial list.
+%   MOTthresh  - theshold for motion in mm      (initial value tested = 5)
+%                displace determined using norm of difference in sesnsor movement in head space
+%
+%
 %   bad_triallist = a list of bad trials
 %
 %   The cleaned events will be written to the same event file.
 %
 % update 3.15.2012 by Kai
-% update 4.17.2012 (WF)
+% update 4.18.2012 (WF)
+
 
 %load data
 %[output, events] = ft_load_fiff_sensors(input,eventfile, prestim, poststim);
@@ -34,22 +39,33 @@ poststim = poststim*1000;
 [output, events] = MEG_load_sensor_trial(input,eventfile, prestim, poststim);
 bad_triallist = [];
 
+if isempty(output) 
+  error('load sensor data empty, aborting', 'MEG_reject');
+ return;
+end
+
 Thresholds = {  ...
  % cRegexp        cThres
- {'displacement', MOTthres  }  % motion
- {'M*1',          MAGthres  }  % magnetometers
- {'M*2',          GRADthres }  % grad
- {'M*3',          GRADthres }
+ {'displacement', MOTthresh  }  % motion
+ {'M*1',          MAGthresh  }  % magnetometers
+ {'M*2',          GRADthresh }  % grad
+ {'M*3',          GRADthresh }
 };
 
-%% check every channel matching each regexp for each threshold type
+%% check every channel matching each regexp (type) for each threshold type
 
 for t = 1:length(Thresholds)
-   cRegexp = Thres{t}{1};
-   cThres  = Thres{t}{2};
+   cRegexp = Thresholds{t}{1};
+   cThres  = Thresholds{t}{2};
+
 
    % get the name of every channel matching the regexp
    channel_list = ft_channelselection(cRegexp,output.label);
+
+   if isempty(channel_list)
+    fprintf('%s has no channel!\n',cRegexp);
+    disp(output.label(end-2:end))
+   end
 
    % go through each trial
    for i = 1:size(output.trial,2)
@@ -67,7 +83,9 @@ for t = 1:length(Thresholds)
            % drop if too high
            if peaktopeak > cThres 
                bad_triallist = [bad_triallist, i];
-               fprintf('Dumping %i because %.4f > %.4f (%s)\n', i,maxi,cThres,cRegexp);
+               fprintf('%s: Dumping %i because a > b: ', cRegexp, i); %.4f > %.4f (%s)\n', i,maxi,cThres,cRegexp);
+               disp([maxi,cThres]);
+               break 
            end
        end % channels
    end % trial

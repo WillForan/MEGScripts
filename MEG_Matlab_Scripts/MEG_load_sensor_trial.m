@@ -39,8 +39,8 @@ trigs = load(eventfile);
 %% if there is an offset
 % e.g. data that hasn't been through ICA
 if hdr.first_samp > 0   % if it is zero, could still do this -- but check wouldn't be useful?
- trig(:,1) = trig(:,1) + hdr.first_samp;
- trig(:,2) = trig(:,2).*4/1000;
+ trigs(:,1) = trigs(:,1) + double(hdr.first_samp);
+ trigs(:,2) = trigs(:,2).*4/1000;
 end
 
 % events never used, trigs never modified?
@@ -53,10 +53,10 @@ if trigs(1,1)~=hdr.first_samp
 end
 
 SamplingRate = hdr.info.sfreq;
-% if hdr.info.sfreq~=SamplingRate
-%    fprintf('\n\t ******* ATTENTION!! Samplingrate mismatch. Wrong event file? Exiting ******* \n\n')
-%    return
-% end
+ if hdr.info.sfreq~=SamplingRate
+    fprintf('\n\t ******* ATTENTION!! Samplingrate mismatch. Wrong event file? Exiting ******* \n\n')
+    return
+ end
 
 %label names
 output.label = hdr.info.ch_names(1:end-1)';
@@ -65,8 +65,8 @@ output.label = hdr.info.ch_names(1:end-1)';
 output.fsample = hdr.info.sfreq;
 epochLength = preStim+postStim;
 
-% add displacment channel
-output.label(end+1) = 'displacment';
+% add displacement channel
+output.label{end+1} = 'displacement';
 data(end+1,:)       = MEG_mean_dist(hdr,data)';
 
 output.trial = [];
