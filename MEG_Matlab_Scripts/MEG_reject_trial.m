@@ -81,7 +81,7 @@ for t = 1:length(Thresholds)
 
            % min is 0 for motion, this is likely not necessary
            % actual min elsewhere
-           if cRegexp == 'displacement'
+           if strcmp(cRegexp,'displacement')
               mini = 0;
            else
               mini = min(output.trial{i}(r,:));
