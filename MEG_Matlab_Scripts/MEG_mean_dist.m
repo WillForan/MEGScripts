@@ -20,6 +20,13 @@ function [meanD, varargout] =  MEG_mean_dist(head,fif)
   CHPIidxs(c) = find( strcmp(head.info.ch_names, CHPIs{c}) );
  end
 
+ % if we didnt find any CHPI channels (idxs is still all 0)
+ % send back motion is all zeros (no motion checking)
+ if all(CHPIidxs == 0)
+   meanD=zeros(1,length(fif))
+   return
+ end
+
  % ensure head.info.chs.coil_trans represents postion: graph it
  %  count=0; for i=1:length(h.info.chs); if(length(h.info.chs(i).coil_trans)>3);count=count+1;  a(count,:)=h.info.chs(i).coil_trans(1:3,4);end; end; plot3(a(:,1),a(:,2),a(:,3),'k.')
 
