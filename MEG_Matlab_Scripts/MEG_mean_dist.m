@@ -23,6 +23,7 @@ function [meanD, varargout] =  MEG_mean_dist(head,fif)
  % if we didnt find any CHPI channels (idxs is still all 0)
  % send back motion is all zeros (no motion checking)
  if all(CHPIidxs == 0)
+   fprintf('****** No CHPI channels = no motion check *******\n'); 
    meanD=zeros(1,length(fif))
    return
  end
