@@ -17,7 +17,7 @@ function [meanD, varargout] =  MEG_mean_dist(head,fif)
 
  for c = 1:length(CHPIs); 
   % find index matching each CHPI channel name
-  CHPIidxs(c) = find( strcmp(head.info.ch_names, CHPIs{1}) );
+  CHPIidxs(c) = find( strcmp(head.info.ch_names, CHPIs{c}) );
  end
 
  % ensure head.info.chs.coil_trans represents postion: graph it
