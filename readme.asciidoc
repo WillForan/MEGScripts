@@ -1,6 +1,6 @@
 == MEG Scripts 
 
-=== EOG_scoring ===
+=== EOG_scoring 
 
 === MEG_Matlab_Scripts
 
