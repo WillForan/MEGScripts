@@ -40,16 +40,20 @@ def {
 name "ANTI-and-VGS-Correct"
 event 1
 ignore 0
-tmin -2.0
-tmax -1.6
+tmin -2.1
+tmax -1.52
+bmin -2.1
+bmax -1.52
 }
 
 def {
 name "ANTI-and-VGS-inCorrect"
 event 2
 ignore 0
-tmin -2.0
-tmax -1.6
+tmin -2.1
+tmax -1.52
+bmin -2.1
+bmax -1.52
 }
 	
 }

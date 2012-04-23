@@ -10,7 +10,7 @@ for s in  10896 10910 10911; do
 		cd ${cwd}/${s}/MEG/
 		
 		#do forward solution
-		mne_do_forward_solution --src ${s}-ico-4-src.fif \
+		mne_do_forward_solution --src ${s}-7-src.fif \
 		--megonly --mindist 5 --overwrite \
 		--meas ${s}_anti_vgs_all_ave.fif \
 		--fwd ${s}_anti_vgs_all_fwd.fif \

@@ -1,19 +1,18 @@
 function Output = MEG_Granger(X,Window,samFS,FOI,ModelOrder,tstep)
-% This function will run Granger causal connectivity analyses. The
-% input is a 3-D data, where x is number of variables, y is number of
-% observation on the time axis, and z is number of trials. This is a moving
-% window analysis, which mean causality will be evaluated in a window
-% length specified and move along the time axis.
-% This function will call functions from Anil Seth's Causal Connectivity
-% Toobox to perform GCA. BSMART toolbox will also need to be in your matlab
-% path.
+% This function will run Granger causal connectivity analyses. The input is
+% a 3-D data, where x is number of variables, y is number of observation on
+% the time axis, and z is number of trials. This is a moving window
+% analysis, which means causality will be evaluated in separate local
+% windows that and move along the time axis. This function will call
+% functions from Anil Seth's Causal Connectivity Toobox to perform GCA.
+% BSMART toolbox will also need to be in your matlab path.
 %   
 %
 % usage:    Output = MEG_Granger(X,Window,samFS,FOI)
 %   Input:
 %       X - input data array, x is variable, y is time, z is number of
 %       trials
-%       Windoq - the length of window you want connectivity to be evaulated.
+%       Window - the length of window you want connectivity to be evaulated.
 %       samFS - the sampling frequency in hz
 %       FOI - vector of frequency of interest, such as [1:100]
 %       ModelOrder - model order use in mvar.
@@ -27,9 +26,9 @@ function Output = MEG_Granger(X,Window,samFS,FOI,ModelOrder,tstep)
 %          2. Give option to do consistency test
 %
 %   Last update May 6, 2011, by Kai
-%
+
 %   updates: ``1. May 6, clean powerline noise with cca_multitaper
-%
+
 
 nobs = size(X,2);
 nvar = size(X,1);

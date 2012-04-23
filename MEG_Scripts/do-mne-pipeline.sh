@@ -5,7 +5,7 @@ cwd=$(pwd)
 for s in $1;  do
 
 	#setup source space
-	mne_setup_source_space --subject $1 --spacing 5 --overwrite 
+	mne_setup_source_space --subject $1 --spacing 7 --overwrite 
 	mne_setup_forward_model --subject $1 --surf --ico 4 --homog
 	
 	cd ${cwd}/${s}/MEG/
@@ -88,7 +88,7 @@ for s in $1;  do
 	
 	
 	#do forward solution
-	mne_do_forward_solution --src ${s}-5-src.fif \
+	mne_do_forward_solution --src ${s}-7-src.fif \
 	--megonly --mindist 5 --overwrite \
 	--meas ${s}_all_all_ave.fif \
 	--fwd ${s}_anti_vgs_all_fwd.fif \

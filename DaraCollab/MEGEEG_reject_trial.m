@@ -1,7 +1,8 @@
-function [ bad_triallist ] = MEGEEG_reject_trial( input, eventfile, outfile, prestim, poststim, MAGthresh, GRADthresh, EEGthresh )
+function [ bad_triallist ] = MEGEEG_reject_trial( input, eventfile, outfile, prestim, poststim, MAGthresh, GRADthresh, EEGthresh, EEGvarthresh )
 %This function will check for sensor artifacts for each trial, and reject
 %trials that peak-to-peak amplitude that exceeds a preset threshold. The
-%cleaned event list will be write out to a new file.
+%cleaned event list will be write out to a new file. This function will
+%check for MEG plus EEG channels.
 %
 %Usage: [ bad_triallist ] = MEG_reject_trial( input, eventfile, prestim, 
 %       poststim, MAGthresh, GRADthresh )
@@ -18,27 +19,32 @@ function [ bad_triallist ] = MEGEEG_reject_trial( input, eventfile, outfile, pre
 %               if peak to peak value in any gradiometer channel exceeds
 %               this threshold, trial will be removed from trial list.
 %
-%   EEGthresh - threshold for EEG, suggest value is 20e-6
+%   EEGthresh - threshold for EEG, suggest value is 150e-6
+%   EEGvarthresh - threshold for EEG signal variance, suggest value is 5e-6
+%                   This is to detect flat EEG channels.
 %   bad_triallist = a list of bad trials
 %
 %   The cleaned events will be written to the same event file.
 %
-%Last update 3.15.2012 by Kai
+%Last update 4.22.2012 by Kai
 
-%load data
-%[output, events] = ft_load_fiff_sensors(input,eventfile, prestim, poststim);
 
-% try using a different function, might be faster
 prestim = prestim*1000;
 poststim = poststim*1000;
-[output, events] = MEG_load_sensor_trial_old(input,eventfile, prestim, poststim);
+events = load(eventfile);
+if events(1,1)~=0
+    [output, events] = MEG_load_sensor_trial(input,eventfile, prestim, poststim);
+elseif events(1,1)==0
+    [output, events] = MEG_load_sensor_trial_old(input,eventfile, prestim, poststim);
+end
 bad_triallist = [];
 bad_channels = [];
 for e=1:size(output.hdr.info.bads,2)
-    bad_channels = [bad_channels, find(strcmp(output.hdr.info.ch_names,output.hdr.info.bads(3)))];
+    bad_channels = [bad_channels, find(strcmp(output.hdr.info.ch_names,output.hdr.info.bads(e)))];
+end
+
 % check magnetometers
 channel_list = ft_channelselection('M*1',output.label);
-end
 for i = 1:size(output.trial,2)
     for n = 1:size(channel_list,1)
         r = find(strcmp(output.label,channel_list(n)));
@@ -96,7 +102,11 @@ for i = 1:size(output.trial,2)
         maxi = max(output.trial{i}(r,:));
         mini = min(output.trial{i}(r,:));
         peaktopeak = maxi-mini;
-        if peaktopeak > EEGthresh
+        variance = std(output.trial{i}(r,:));
+        if peaktopeak > EEGthresh 
+            bad_triallist = [bad_triallist, i];
+        end
+        if variance < EEGvarthresh
             bad_triallist = [bad_triallist, i];
         end
     end
@@ -106,14 +116,17 @@ end
 if any(bad_triallist)
     bad_triallist = unique(bad_triallist);
     fprintf('\n*\n*\n*\n')
-    disp(['Bad trials found:' num2str(bad_triallist) ]);
+    disp(['Bad trials found:' num2str(length(bad_triallist)) ]);
     fprintf('\n*\n*\n*\n')
-    %bad_triallist = bad_triallist
-    size(events);
-    events(bad_triallist,:)=[];
-    events=[0 0 0 0;events];
+    if events(1,1)==0
+        events=[0 0 0 0;events];
+        bad_triallist = bad_triallist+1;
+        events(bad_triallist,:)=[];
+    else
+        events(bad_triallist,:)=[];
+    end
     
-    if size(events,1)<10
+    if size(events,1)<5
        warningfile=strcat(outfile,'WARNING')
         dlmwrite (warningfile,events,'delimiter', '\t',  'precision', 10);
     end

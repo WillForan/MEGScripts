@@ -1,10 +1,22 @@
-%% calculate position of censor for each step
-% in head coord (from device cords)
-%
-% called with one output argument, just return difference of each timepoint to the next as #####x1 vector in mm
-% called with two                  return movie of motion (displayed as it's made)
-
 function [meanD, varargout] =  MEG_mean_dist(head,fif)
+% This function will calculate the device to head cooridnate transformation
+% for each timepoint, convert the sensor coordinates into head space, and
+% calculate the average displacement of all sensors for each timepoint
+% (Wehner et al 2008 NeuroImage). This is effectively equivalent of
+% caluclating the instantaneous head motion. If cHPI channels do not exist
+% (head motion not recorded), then output will be set to zero.
+%
+%   Usage: [meanD, varargout] =  MEG_mean_dist(head,fif)
+%   head and fiff are header and data strucutures from read_fiff.m
+%   When called with one output argument, just return difference of each
+%   timepoint to the next as #####x1 vector in mm When called with two
+%   return movie of motion (displayed as it's made)
+%
+% Author: Will Foran the Great, 4.20.2012
+
+%Update log
+% Intially written by Will
+
  %% check arguments
  if(length(nargout)>2)
   error('MEG_mean_dist','too many outputs expected');

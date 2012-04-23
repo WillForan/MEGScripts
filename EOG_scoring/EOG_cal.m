@@ -35,7 +35,7 @@ cal_data = fiff_read_raw_segment(raw);
 
 sr = raw.info.sfreq;     % sampling rate
 raw_triggers = cal_data(310,:);    % trigger channel STI 101 is channel 310
-horizontal = filter_channel(cal_data(horizontal_eog,:),sr,'high',0.1,'low',10)*1e6;  % input horizontal EOG channel
+horizontal = filter_channel(cal_data(horizontal_eog,:),sr,'high',1,'low',20)*1e6;  % input horizontal EOG channel
 vertical = cal_data(vertical_eog,:);  % vertical EOG channel
 vertical = zscore(vertical);
 zhorizontal = zscore(horizontal);

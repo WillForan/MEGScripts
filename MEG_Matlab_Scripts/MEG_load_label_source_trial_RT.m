@@ -3,7 +3,7 @@ function [ output ] = MEG_load_label_source_trial_RT( inputfile, eventfile, Samp
 %mne_compute_raw_inverse. Each data channel will be source estimates from
 %one single label (ROI). This function will then read trial timing from the
 %event file to chop epochs of interest, and compile a fieldtrip data
-%structure. This version will load reaction time info
+%structure. This version will also load reaction time info.
 %   
 %   usage: [ output ] = MEG_load_label_source_trial( inputfile, eventfile,
 %   SamplingRate, pretStim, postStim )

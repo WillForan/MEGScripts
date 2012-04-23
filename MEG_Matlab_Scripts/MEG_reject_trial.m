@@ -1,39 +1,42 @@
 function [ bad_triallist ] = MEG_reject_trial( input, eventfile,newEventfile, prestim, poststim, MAGthresh, GRADthresh, MOTthresh )
 %                                              .fif    .eve      new.eve        2.5      1         1e-11       3e-10      5
-%This function will check for sensor artifacts for each trial, and reject
-%trials that peak-to-peak amplitude that exceeds a preset threshold. The
-%cleaned event list will be write out to a new file.
+%This function will check for sensor artifacts and instantaneous head
+%motion for each trial, and reject trials that head motion or peak-to-peak
+%amplitude exceed a preset threshold. The cleaned event list will be write
+%out to a new file.
 %
 %Usage: [ bad_triallist ] = MEG_reject_trial( input, eventfile, prestim, 
 %       poststim, MAGthresh, GRADthresh, MOTthresh )
 %
 %   input      - fiff file to be loaded
 %   eventfile  - event file in mne format that defines tials to be examined
-%   prestim    - prestimulus length in seconds  (initial experment value = 2.5 )
-%   poststim   - poststimulus length in seconds (initial experment value = 1   )
-%   MAGthresh  - threshold for magnetometers    (suggest values is 1e-11)
+%   prestim    - prestimulus length in seconds  (For AS task, value = 2.5 )
+%   poststim   - poststimulus length in seconds (For AS task, value = 1   )
+%   MAGthresh  - threshold for magnetometers    (suggest value is 1e-11)
 %                if peak to peak value in any magnetometer channel exceeds
 %                this threshold, trial will be removed from trial list.
-%   GRADthresh - threshold for magnetometers    (suggest values is 3e-10)
+%   GRADthresh - threshold for gradiometers    (suggest value is 3e-10)
 %                if peak to peak value in any gradiometer channel exceeds
 %                this threshold, trial will be removed from trial list.
 %   MOTthresh  - theshold for motion in mm      (initial value tested = 5)
-%                displace determined using norm of difference in sesnsor movement in head space
+%                displace determined using norm of difference in sesnsor
+%                movement in head space
 %
 %
 %   bad_triallist = a list of bad trials
 %
 %   The cleaned events will be written to the same event file.
 %
-% update 3.15.2012 by Kai
-% update 4.18.2012 (WF)
+% update 4.22.2012 by Kai
+% update 4.20.2012 by Will Foran the Great.
 
+%update logs
+% 4.18.2012, WF added motion rejection.
+% 4.22.2012, KH updated comments.
 
-%load data
-%[output, events] = ft_load_fiff_sensors(input,eventfile, prestim, poststim);
-
-% try using a different function, might be faster
- prestim =  prestim*1000;
+% convert to ms since MEG_load_sensor_trial defines time in ms.
+% blame Kai for this inconsistency.
+prestim =  prestim*1000;
 poststim = poststim*1000;
 
 % load output struct for each event/trial + displacement channel"
@@ -49,8 +52,8 @@ Thresholds = {  ...
  % cRegexp        cThres
  {'displacement', MOTthresh  }  % motion
  {'M*1',          MAGthresh  }  % magnetometers
- {'M*2',          GRADthresh }  % grad
- {'M*3',          GRADthresh }
+ {'M*2',          GRADthresh }  % gradiometers, longitude or latitude
+ {'M*3',          GRADthresh }  % gradiometers, longitude or latitude
 };
 
 %% check every channel matching each regexp (type) for each threshold type

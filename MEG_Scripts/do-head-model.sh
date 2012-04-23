@@ -1,5 +1,5 @@
 
-for s in 10901 10938 10945 ; do
+for s in 10941 ; do
 
 	while [`jobs | wc -l` -ge 12 ]
   	do

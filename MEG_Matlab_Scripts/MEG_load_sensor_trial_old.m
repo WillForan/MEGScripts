@@ -1,8 +1,8 @@
 function [ output, events ] = MEG_load_sensor_trial_old( inputfile, eventfile, preStim, postStim )
-%This function will load trial by trial sensor data. 
-%This function will then read trial timing from the
-%event file to chop epochs of interest, and compile a fieldtrip data
-%structure. Not the event file has to be the "old" format. 
+%This function will load trial by trial sensor data, then read trial timing
+%from the event file, chop data into trial epochs, and compile trials into
+%a fieldtrip data structure. Note the event file has to be the "old"
+%format.
 %   
 %   usage: [ output, events ] = MEG_load_sensor_trial( inputfile, eventfile,
 %   pretStim, postStim )
@@ -23,7 +23,7 @@ function [ output, events ] = MEG_load_sensor_trial_old( inputfile, eventfile, p
 %       output.trialinfo - trigger code.
 %       events - events in mne event file format
 %
-%   Last update 3.15.2012, by Kai
+%   Last update 4.22.2012, by Kai
 
 %load fiff data
 [hdr,data] = read_fiff(inputfile);

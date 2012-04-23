@@ -4,12 +4,13 @@ function MEG_ICA_denoising_wrapper( subjects, ekg_flag )
 %Which has been downsampled and sss'd. The output will be
 %subj_anti_runx_dn_ds_sss_raw.fif. The function will loop through subjects
 %and runs in the multimodal anti study folder.
-%   Usage: MEG_ICA_denoising_wrapper( subj )
+%   Usage: MEG_ICA_denoising_wrapper( subj, ekg_flag )
 %   subjects - vector of subjects to be analyzed
-%   ekg_flag - flag to do aggresive ekg removal, lower r threshold to .1
+%   ekg_flag - flag to do aggresive ekg removal, lower number of
+%   components and r threshold.
 %              1 = on, 0 = off.
 %
-%last update 3.14.2012.
+%last update 4.22.2012.
 
 for s = 1:size(subjects,2) 
     subj = subjects(s);

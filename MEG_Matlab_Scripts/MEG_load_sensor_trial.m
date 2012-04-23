@@ -1,11 +1,10 @@
 function [ output, events ] = MEG_load_sensor_trial( inputfile, eventfile, preStim, postStim )
-%This function will load trial by trial sensor data. 
-%This function will then read trial timing from the
-%event file to chop epochs of interest, and compile a fieldtrip data
-%structure.
+%This function will load trial by trial sensor data, then read trial timing
+%from the event file, chop data into trial epochs, and compile trials into
+%a fieldtrip data structure.
 %   
-%   usage: [ output, events ] = MEG_load_sensor_trial( inputfile, eventfile,
-%   pretStim, postStim )
+%   usage: [ output, events ] = MEG_load_sensor_trial( inputfile,
+%   eventfile, pretStim, postStim )
 %
 %   Input:
 %       inputfile - fiff file
@@ -14,17 +13,23 @@ function [ output, events ] = MEG_load_sensor_trial( inputfile, eventfile, preSt
 %       preStim - length of presitm baseline, in ms
 %
 %   Output:
-%       output.label - cell-array containing strings, Nchan X 1
-%       output.fsample - sampling frequency in Hz output.trial - cell-array
-%           containing a data matrix for each trial (1 X Ntrial), each data
-%           matrix is Nchan X Nsamples
-%       output.time - cell-array containing a time axis for each trial (1 X
-%           Ntrial), each time axis is a 1 X Nsamples vector. In Sec.
+%       output.label     - cell-array containing strings, Nchan X 1
+%       output.fsample   - sampling frequency in Hz 
+%       output.trial     - cell-array containing a data matrix for each 
+%                          trial (1 X Ntrial), each data matrix is 
+%                          Nchan X Nsamples
+%       output.time      - cell-array containing a time axis for each trial
+%                          (1 X Ntrial), each time axis is a 1 X Nsamples 
+%                          vector. In Seconds.
 %       output.trialinfo - trigger code.
-%       events - events in mne event file format
+%       events           - events in mne event file format
 %
-%   update 3.15.2012, by Kai
-%   update 4.17.2012 (WF)
+%   update 4.22.2012, by Kai
+%   update 4.17.2012 by WF
+
+%update log
+%4.17.2012 add motion displacement channel, by WF.
+%4.22.2012 use MEG_mean_disp.
 
 %load fiff data
 [hdr,data] = read_fiff(inputfile);
@@ -67,7 +72,7 @@ epochLength = preStim+postStim;
 
 % add displacement channel
 output.label{end+1} = 'displacement';
-data(end+1,:)       = MEG_mean_dist(hdr,data)';
+data(end+1,:)       = MEG_mean_disp(hdr,data)';
 
 output.trial = [];
 for n = 2:1:size(trigs,1)
